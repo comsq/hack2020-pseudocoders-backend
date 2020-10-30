@@ -1,6 +1,6 @@
 from json import loads
 
-from django.http import JsonResponse, HttpRequest, HttpResponse
+from django.http import JsonResponse, HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import User
@@ -8,6 +8,9 @@ from .models import User
 
 @csrf_exempt
 def login(req: HttpRequest):
+    if req.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
     req_data = loads(req.body)
     login = req_data.get('login')
     password = req_data.get('password')

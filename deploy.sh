@@ -4,7 +4,7 @@
 scp -r project 130.193.41.149:/home/dimastark/
 
 # connect to backend server
-ssh 130.193.41.149 '
+ssh dimastark@130.193.41.149 '
 cd /home/dimastark/
 
 # source all environment variables
