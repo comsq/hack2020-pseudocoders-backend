@@ -21,8 +21,8 @@ class User(models.Model):
 
     user_directory_path = models.CharField(verbose_name='Папка пользователя', max_length=511)
 
-    groups = models.ManyToManyField('Group', verbose_name='Группы')
-    tasks = models.ManyToManyField('Task')
+    groups = models.ManyToManyField('Group', verbose_name='Группы', null=True, blank=True)
+    tasks = models.ManyToManyField('Task', verbose_name='Задачи', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -38,7 +38,7 @@ class User(models.Model):
 class Group(models.Model):
     name = models.CharField(verbose_name='Группа', max_length=127)
     slug = models.CharField(verbose_name='Слаг', max_length=63, unique=True)
-    tasks = models.ManyToManyField('Task')
+    tasks = models.ManyToManyField('Task', verbose_name='Задачи', null=True, blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
@@ -56,7 +56,7 @@ class Task(models.Model):
     slug = models.CharField(verbose_name='Слаг', max_length=63, unique=True)
     layout = models.ForeignKey('Layout', verbose_name='Шаблон', null=True, on_delete=models.SET_NULL)
     tests = models.CharField(verbose_name='Путь до тестов', max_length=511)
-    languages = models.ManyToManyField('Language', verbose_name='Языки')
+    languages = models.ManyToManyField('Language', verbose_name='Языки', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Задача'
