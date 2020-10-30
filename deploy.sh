@@ -4,17 +4,22 @@
 scp -r project 130.193.41.149:/home/dimastark/
 
 # connect to backend server
-ssh 130.193.41.149
+ssh 130.193.41.149 '
+cd /home/dimastark/
 
 # source all environment variables
 set -a
-source /home/dimastark/
+source backend-env
 set +a
 
-# run migrations
+# configure environment
+cd project
+
+/home/dimastark/.local/bin/pipenv install --deploy --system --ignore-pipfile
 python3 /home/dimastark/project/manage.py migrate
-python3 /home/dimastark/proejct/manage.py collectstatic --no-input --clear
+python3 /home/dimastark/project/manage.py collectstatic --no-input --clear
 
 # restart service
 sudo service celery restart
 sudo service gunicorn restart
+'
