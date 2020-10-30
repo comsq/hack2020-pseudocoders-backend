@@ -1,12 +1,11 @@
 from django.contrib import admin
 from django.urls import include, path
 
-from tasks.views import get_status, home, run_task
+from tasks.views import home
 
 urlpatterns = (
     path('admin/', admin.site.urls),
-    path('tasks/<task_id>/', get_status, name='get_status'),
-    path('tasks/', run_task, name='run_task'),
     path('api/', include('api.urls')),
+    path('tasks/', include('tasks.urls')),
     path('', home, name='home'),
 )
