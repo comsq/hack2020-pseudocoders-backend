@@ -5,5 +5,6 @@ from .models import User
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    search_fields = ('first_name', 'last_name', 'login')
-    filter
+    list_display = ('login', 'full_name', 'user_type')
+    search_fields = ('first_name', 'last_name', 'login', 'middle_name')
+    list_filter = ('user_type',)

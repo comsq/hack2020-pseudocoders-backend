@@ -18,3 +18,13 @@ class User(models.Model):
 
     birthday = models.DateField(verbose_name='Дата рождения')
     user_type = models.CharField(verbose_name='Роль', choices=TypeChoices.choices, max_length=31)
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
+    def __str__(self):
+        return self.login
+
+    def full_name(self):
+        return f'{self.last_name} {self.first_name} {self.middle_name}'
