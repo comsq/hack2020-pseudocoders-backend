@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # copy project files
-scp -r project 130.193.41.149:/home/dimastark/
+scp -r project dimastark@130.193.41.149:/home/dimastark/
 
 # connect to backend server
 ssh dimastark@130.193.41.149 '
