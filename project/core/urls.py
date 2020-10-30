@@ -7,6 +7,6 @@ urlpatterns = (
     path('admin/', admin.site.urls),
     path('tasks/<task_id>/', get_status, name='get_status'),
     path('tasks/', run_task, name='run_task'),
-    path('users/', include('users.urls')),
+    path('api/', include('api.urls')),
     path('', home, name='home'),
 )
