@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 
+from django.db.utils import IntegrityError
 from django.conf import settings
 from django.http import JsonResponse, HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
@@ -54,12 +55,15 @@ def create_task(req: HttpRequest):
                 f.write(test['input'])
             with open(settings.TESTS_DIR / slug / f'output_{i}.txt', 'w') as f:
                 f.write(test['output'])
-        task = Task.objects.create(
-            name=req_data['name'],
-            description=req_data['description'],
-            slug=slug,
-            author=author,
-        )
+        try:
+            task = Task.objects.create(
+                name=req_data['name'],
+                description=req_data['description'],
+                slug=slug,
+                author=author,
+            )
+        except IntegrityError:
+            return HttpResponse('task with slug exists', status=400)
 
         task.languages.set(languages)
 
