@@ -1,5 +1,4 @@
 from pathlib import Path
-
 from django.conf import settings
 from django.db import models
 
@@ -118,7 +117,7 @@ class TaskCheck(models.Model):
     )
     tests_count = models.IntegerField(verbose_name='Количество тестов')
     passed_tests_count = models.IntegerField(verbose_name='Количество пройденных тестов')
-    date = models.DateTimeField(verbose_name='Время сдачи')
+    date = models.DateTimeField(verbose_name='Время сдачи', auto_now_add=True)
     language = models.ForeignKey('Language', on_delete=models.SET_NULL, null=True)
 
     class Meta:
