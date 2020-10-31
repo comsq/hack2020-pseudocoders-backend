@@ -84,6 +84,7 @@ class LanguageViewSet(ModelViewSet):
 class TaskViewSet(ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
+    lookup_field = 'slug'
 
 
 class TaskCheckViewSet(ModelViewSet):
