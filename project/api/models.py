@@ -55,7 +55,7 @@ class Group(models.Model):
     slug = models.CharField(verbose_name='Слаг', max_length=63, unique=True)
     tasks = models.ManyToManyField('Task', verbose_name='Задачи', blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
-    users = models.ManyToManyField(User, verbose_name='Пользователи', blank=True, related_name='users')
+    users = models.ManyToManyField(User, verbose_name='Пользователи', blank=True, related_name='groups')
 
     class Meta:
         verbose_name = 'Группа'

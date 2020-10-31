@@ -13,7 +13,6 @@ from .tools import generate_slug, serialize_task, serialize_task_check
 def login(req: HttpRequest):
     if req.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
-
     req_data = json.loads(req.body)
     login = req_data.get('login')
     password = req_data.get('password')
@@ -82,7 +81,7 @@ def user_tasks(req: HttpRequest, user_id: int):
         already_added.add(task.id)
         user_tasks.append(serialize_task(task))
 
-    groups = user.users.all()
+    groups = user.groups.all()
     for group in groups:  # type: Group
         for task in group.tasks.all():
             if task.id in already_added:
