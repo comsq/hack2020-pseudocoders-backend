@@ -25,7 +25,7 @@ class TaskAdmin(admin.ModelAdmin):
 
 @admin.register(TaskCheck)
 class TaskCheckAdmin(admin.ModelAdmin):
-    list_display = ('date', 'student', 'task', 'language', 'status', 'passed_tests_count', 'tests_count')
+    list_display = ('date', 'user', 'task', 'language', 'status', 'passed_tests_count', 'tests_count')
 
 
 @admin.register(User)
