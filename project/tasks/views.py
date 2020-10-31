@@ -68,12 +68,13 @@ def stop_editor(request: HttpRequest, user_id: int) -> HttpResponse:
 @csrf_exempt
 def editor_status(request: HttpRequest, user_id: int) -> HttpResponse:
     try:
-        models.User.objects.get(id=user_id)
+        user = models.User.objects.get(id=user_id)
     except models.User.DoesNotExist:
         return HttpResponseBadRequest()
 
     result = {
         'status': code_editor.status(user_id),
+        'port': user.editor_port,
     }
 
     return JsonResponse(result, status=202)

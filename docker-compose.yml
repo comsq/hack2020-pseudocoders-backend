@@ -6,6 +6,7 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./project:/usr/src/app/
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 1337:8000
     depends_on:
