@@ -1,11 +1,11 @@
 from secrets import choice
 from string import ascii_lowercase
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from .models import Task, TaskCheck, User
 
 
-def get_verdict(user: User, task: Task):
+def get_verdict(user: User, task: Task) -> Optional[str]:
     all_checks = TaskCheck.objects.filter(user=user, task=task).order_by('-date')
     if len(all_checks) == 0:
         return None
@@ -22,7 +22,7 @@ def generate_slug(length: int = 30) -> str:
     return ''.join(letters)
 
 
-def serialize_task(task: Task, verdict: str = None) -> Dict[str, Any]:
+def serialize_task(task: Task, verdict: Optional[str] = None) -> Dict[str, Any]:
     serialize_task = {
         "id": task.id,
         "author": {
