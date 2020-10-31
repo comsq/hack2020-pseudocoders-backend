@@ -69,6 +69,10 @@ def create_task(req: HttpRequest):
 
 @csrf_exempt
 def user_tasks(req: HttpRequest, user_id: int):
+    '''
+    FIXME: придумай куда вставить нормально создание директорий с заданиями, создавать пачку директорий на каждый GET
+    плохо, но для хакатона пойдёт
+    '''
     user = User.objects.get(pk=user_id)
     if user is None:
         return HttpResponse(status=404)
@@ -79,6 +83,7 @@ def user_tasks(req: HttpRequest, user_id: int):
         for task in user.tasks.all():  # type: Task
             if task.id in already_added:
                 continue
+            os.makedirs(settings.USERS_DIR / user.login / 'project' / task.slug)
             already_added.add(task.id)
             verdict = get_verdict(user, task)
             student_tasks.append(serialize_task(task, verdict=verdict))
@@ -88,6 +93,7 @@ def user_tasks(req: HttpRequest, user_id: int):
             for task in group.tasks.all():
                 if task.id in already_added:
                     continue
+                os.makedirs(settings.USERS_DIR / user.login / 'project' / task.slug)
                 already_added.add(task.id)
                 verdict = get_verdict(user, task)
                 student_tasks.append(serialize_task(task, verdict=verdict))

@@ -39,16 +39,9 @@ def start_editor(request: HttpRequest, user_id: int) -> HttpResponse:
         return HttpResponseNotAllowed(['POST'])
 
     try:
-        user = models.User.objects.get(id=user_id)
+        models.User.objects.get(id=user_id)
     except models.User.DoesNotExist:
         return HttpResponseBadRequest()
-
-    for task in user.tasks.all():
-        os.makedirs(settings.USERS_DIR / user.login / 'project' / task.slug, exist_ok=True)
-
-    for group in user.groups.all():
-        for task in group.tasks.all():
-            os.makedirs(settings.USERS_DIR / user.login / 'project' / task.slug, exist_ok=True)
 
     result = {
         'task_id': code_editor.start.delay(user_id).id,
