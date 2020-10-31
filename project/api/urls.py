@@ -1,14 +1,18 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 
-from .views import login, GroupListView, LanguageListView, TaskCheckListView, TaskListView, UserListView
+from .views import login, GroupViewSet, LanguageViewSet, TaskCheckViewSet, TaskViewSet, UserViewSet
+
+
+router = DefaultRouter()
+router.register(r'groups', GroupViewSet, basename='groups'),
+router.register(r'languages', LanguageViewSet, basename='languages'),
+router.register(r'tasks', TaskViewSet, basename='tasks'),
+router.register(r'task_checks', TaskCheckViewSet, basename='task_checks'),
+router.register(r'users', UserViewSet, basename='user')
 
 
 app_name = 'api'
 urlpatterns = [
-    path('groups/', GroupListView.as_view(), name='groups'),
-    path('languages/', LanguageListView.as_view(), name='languages'),
-    path('tasks/', TaskListView.as_view(), name='tasks'),
-    path('task_checks/', TaskCheckListView.as_view(), name='task_checks'),
-    path('users/', UserListView.as_view(), name='users'),
     path('login/', login, name='login'),
-]
+] + router.urls

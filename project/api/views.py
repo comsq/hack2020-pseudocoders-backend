@@ -2,7 +2,7 @@ from json import loads
 
 from django.http import JsonResponse, HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.generics import ListAPIView
+from rest_framework.viewsets import ModelViewSet
 
 from .models import Group, Language, Task, TaskCheck, User
 from .serialzers import GroupSerializer, LanguageSerializer, TaskSerializer, TaskCheckSerializer, UserSerializer
@@ -33,26 +33,26 @@ def login(req: HttpRequest):
     )
 
 
-class GroupListView(ListAPIView):
+class GroupViewSet(ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
 
-class LanguageListView(ListAPIView):
+class LanguageViewSet(ModelViewSet):
     queryset = Language.objects.all()
     serializer_class = LanguageSerializer
 
 
-class TaskListView(ListAPIView):
+class TaskViewSet(ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
 
-class TaskCheckListView(ListAPIView):
+class TaskCheckViewSet(ModelViewSet):
     queryset = TaskCheck.objects.all()
     serializer_class = TaskCheckSerializer
 
 
-class UserListView(ListAPIView):
+class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
