@@ -24,7 +24,7 @@ LAYOUTS_DIR = Path('/home/layouts/') if IS_PRODUCTION else Path('/tmp/layouts/')
 
 for directory in (USERS_DIR, TESTS_DIR, LAYOUTS_DIR):
     try:
-        os.makedirs(directory)
+        os.makedirs(directory, exist_ok=True)
     except OSError:
         pass
 
