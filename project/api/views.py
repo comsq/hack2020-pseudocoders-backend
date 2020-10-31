@@ -6,7 +6,7 @@ from django.http import JsonResponse, HttpRequest, HttpResponse, HttpResponseNot
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Group, Language, Task, TaskCheck, User
-from .tools import generate_slug, serialize_task, serialize_task_check
+from .tools import generate_slug, serialize_task, serialize_task_check, get_verdict
 
 
 @csrf_exempt
@@ -80,7 +80,8 @@ def user_tasks(req: HttpRequest, user_id: int):
             if task.id in already_added:
                 continue
             already_added.add(task.id)
-            student_tasks.append(serialize_task(task))
+            verdict = get_verdict(user, task)
+            student_tasks.append(serialize_task(task, verdict=verdict))
 
         groups = user.groups.all()
         for group in groups:  # type: Group
@@ -88,7 +89,8 @@ def user_tasks(req: HttpRequest, user_id: int):
                 if task.id in already_added:
                     continue
                 already_added.add(task.id)
-                student_tasks.append(serialize_task(task))
+                verdict = get_verdict(user, task)
+                student_tasks.append(serialize_task(task, verdict=verdict))
 
         return JsonResponse(student_tasks, safe=False)
 
