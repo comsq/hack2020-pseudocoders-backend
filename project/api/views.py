@@ -48,8 +48,7 @@ def create_task(req: HttpRequest):
 
         os.makedirs(settings.TESTS_DIR / slug, exist_ok=True)
         tests = req_data['tests']
-        for i, test in enumerate(tests, start=1):
-            with open(settings.TESTS_DIR / slug / f'input_{i}.txt', 'w') as f:
+        for i, test in enumerate(tests, start=1): with open(settings.TESTS_DIR / slug / f'input_{i}.txt', 'w') as f:
                 f.write(test['input'])
             with open(settings.TESTS_DIR / slug / f'output_{i}.txt', 'w') as f:
                 f.write(test['output'])
@@ -83,7 +82,7 @@ def user_tasks(req: HttpRequest, user_id: int):
         for task in user.tasks.all():  # type: Task
             if task.id in already_added:
                 continue
-            os.makedirs(settings.USERS_DIR / user.login / 'project' / task.slug)
+            os.makedirs(settings.USERS_DIR / user.login / 'project' / task.slug, exist_ok=True)
             already_added.add(task.id)
             verdict = get_verdict(user, task)
             student_tasks.append(serialize_task(task, verdict=verdict))
@@ -93,7 +92,7 @@ def user_tasks(req: HttpRequest, user_id: int):
             for task in group.tasks.all():
                 if task.id in already_added:
                     continue
-                os.makedirs(settings.USERS_DIR / user.login / 'project' / task.slug)
+                os.makedirs(settings.USERS_DIR / user.login / 'project' / task.slug, exist_ok=True)
                 already_added.add(task.id)
                 verdict = get_verdict(user, task)
                 student_tasks.append(serialize_task(task, verdict=verdict))
