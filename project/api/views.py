@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 
 from django.conf import settings
 from django.http import JsonResponse, HttpRequest, HttpResponse, HttpResponseNotAllowed
@@ -65,6 +66,42 @@ def create_task(req: HttpRequest):
         return HttpResponse(status=201)
 
     return HttpResponseNotAllowed(['POST'])
+
+
+@csrf_exempt
+def update_task(req: HttpRequest, task_id: int):
+    if req.method != 'PUT':
+        return HttpResponseNotAllowed(['PUT'])
+
+    task = Task.objects.get(pk=task_id)
+    req_data = json.loads(req.body)
+    slug = req_data.get('slug') or generate_slug(10)
+
+    author_id = req_data.get('author', 1)
+    author = User.objects.get(pk=author_id)
+
+    lang_slugs = req_data['languages']
+    languages = Language.objects.filter(slug__in=lang_slugs)
+
+    if os.path.exists(settings.TESTS_DIR / slug):
+        shutil.rmtree(settings.TESTS_DIR / slug)
+    os.makedirs(settings.TESTS_DIR / slug, exist_ok=True)
+    tests = req_data['tests']
+    for i, test in enumerate(tests, start=1):
+        with open(settings.TESTS_DIR / slug / f'input_{i}.txt', 'w') as f:
+            f.write(test['input'])
+        with open(settings.TESTS_DIR / slug / f'output_{i}.txt', 'w') as f:
+            f.write(test['output'])
+
+    task.name = req_data['name']
+    task.description = req_data['description']
+    task.slug = slug
+    task.author = author
+    task.save()
+
+    task.languages.set(languages)
+
+    return HttpResponse(status=200)
 
 
 @csrf_exempt
