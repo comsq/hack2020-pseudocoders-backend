@@ -5,9 +5,18 @@ from .models import Group, Language, Task, TaskCheck, User
 
 
 class GroupSerializer(ModelSerializer):
+    users = serializers.SerializerMethodField('get_users')
+    tasks = serializers.SerializerMethodField('get_tasks')
+
     class Meta:
         model = Group
         fields = '__all__'
+
+    def get_users(self, obj: Group):
+        return UserSerializer(obj.user_set.all(), many=True, fields=('id', 'login', 'first_name', 'last_name')).data
+
+    def get_tasks(self, obj: TaskCheck):
+        return TaskSerializer(obj.tasks, many=True, fields=('id', 'name', 'slug')).data
 
 
 class LanguageSerializer(ModelSerializer):
@@ -36,7 +45,7 @@ class TaskSerializer(ModelSerializer):
         return UserSerializer(obj.author, fields=('id', 'first_name', 'last_name', 'login')).data
 
     def get_languages(self, obj: Task):
-        return list(LanguageSerializer(lang).data for lang in obj.languages.all())
+        return LanguageSerializer(obj.languages.all(), many=True).data
 
 
 class TaskCheckSerializer(ModelSerializer):
