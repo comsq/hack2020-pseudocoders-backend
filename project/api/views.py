@@ -52,7 +52,7 @@ def create_task(req: HttpRequest):
         os.makedirs(settings.TESTS_DIR / slug, exist_ok=True)
         tests = req_data['tests']
         for i, test in enumerate(tests, start=1):
-            with open(settings.TESTS_DIR / slug / f'intput_{i}.txt', 'w') as f:
+            with open(settings.TESTS_DIR / slug / f'input_{i}.txt', 'w') as f:
                 f.write(test['input'])
             with open(settings.TESTS_DIR / slug / f'output_{i}.txt', 'w') as f:
                 f.write(test['output'])
