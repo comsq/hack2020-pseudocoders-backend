@@ -1,3 +1,6 @@
+import os
+
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
@@ -60,6 +63,24 @@ class TaskCheckSerializer(ModelSerializer):
 
     def get_date_in_ms(self, obj: TaskCheck):
         return int(obj.date.timestamp() * 1000)
+
+
+class TaskWithExamplesSerializer(TaskSerializer):
+    tests = serializers.SerializerMethodField(method_name='get_examples')
+
+    def get_examples(self, obj: Task):
+        tests = []
+        for i in range(1, 4):
+            inp_file = settings.TESTS_DIR / obj.slug / f'input_{i}.txt'
+            if not os.path.exists(inp_file):
+                break
+            out_file = settings.TESTS_DIR / obj.slug / f'output_{i}.txt'
+            with open(inp_file) as f:
+                inp = f.read()
+            with open(out_file) as f:
+                out = f.read()
+            tests.append({'input': inp, 'output': out})
+        return tests
 
 
 class UserSerializer(ModelSerializer):
