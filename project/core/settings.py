@@ -17,7 +17,15 @@ IS_PRODUCTION = bool(os.environ.get('PRODUCTION'))
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+USERS_DIR = '/home/students/' if IS_PRODUCTION else '/tmp/students/'
+TESTS_DIR = '/home/tests/' if IS_PRODUCTION else '/tmp/tests/'
+LAYOUTS_DIR = '/home/layouts/' if IS_PRODUCTION else '/tmp/layouts/'
 
+for directory in (USERS_DIR, TESTS_DIR, LAYOUTS_DIR):
+    try:
+        os.makedirs(directory)
+    except OSError:
+        pass
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/

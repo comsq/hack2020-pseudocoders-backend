@@ -5,6 +5,8 @@ from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotAll
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
+from api import models
+from tasks import code_editor
 from tasks.sample_tasks import create_task
 
 
@@ -24,6 +26,55 @@ def run_task(request: HttpRequest) -> HttpResponse:
 
     result = {
         'task_id': create_task.delay(task_type).id,
+    }
+
+    return JsonResponse(result, status=202)
+
+
+@csrf_exempt
+def start_editor(request: HttpRequest, user_id: int) -> HttpResponse:
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    try:
+        models.User.objects.get(id=user_id)
+    except models.User.DoesNotExist:
+        return HttpResponseBadRequest()
+
+    result = {
+        'task_id': code_editor.start.delay(user_id).id,
+    }
+
+    return JsonResponse(result, status=202)
+
+
+@csrf_exempt
+def stop_editor(request: HttpRequest, user_id: int) -> HttpResponse:
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    try:
+        models.User.objects.get(id=user_id)
+    except models.User.DoesNotExist:
+        return HttpResponseBadRequest()
+
+    result = {
+        'task_id': code_editor.stop.delay(user_id).id,
+    }
+
+    return JsonResponse(result, status=202)
+
+
+@csrf_exempt
+def editor_status(request: HttpRequest, user_id: int) -> HttpResponse:
+    try:
+        user = models.User.objects.get(id=user_id)
+    except models.User.DoesNotExist:
+        return HttpResponseBadRequest()
+
+    result = {
+        'status': code_editor.status(user_id),
+        'port': user.editor_port,
     }
 
     return JsonResponse(result, status=202)

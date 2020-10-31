@@ -1,3 +1,6 @@
+from pathlib import Path
+
+from django.conf import settings
 from django.db import models
 
 
@@ -19,8 +22,6 @@ class User(models.Model):
     birthday = models.DateField(verbose_name='Дата рождения')
     user_type = models.CharField(verbose_name='Роль', choices=TypeChoices.choices, max_length=31)
 
-    user_directory_path = models.CharField(verbose_name='Папка пользователя', max_length=511)
-
     groups = models.ManyToManyField('Group', verbose_name='Группы', blank=True)
     tasks = models.ManyToManyField('Task', verbose_name='Задачи', blank=True)
 
@@ -31,6 +32,22 @@ class User(models.Model):
     def __str__(self):
         return self.login
 
+    @property
+    def directory(self) -> Path:
+        return Path(settings.USERS_DIR) / self.login
+
+    @property
+    def editor_name(self) -> str:
+        return f'editor-{self.login}'
+
+    @property
+    def editor_port(self) -> int:
+        return 8000 + self.id
+
+    def get_task_directory(self, task_slug: str) -> Path:
+        return self.directory / task_slug
+
+    @property
     def full_name(self):
         return f'{self.last_name} {self.first_name} {self.middle_name}'
 
@@ -55,24 +72,30 @@ class Task(models.Model):
     description = models.TextField(verbose_name='Описание')
     slug = models.CharField(verbose_name='Слаг', max_length=63, unique=True)
     layout = models.ForeignKey('Layout', verbose_name='Шаблон', null=True, on_delete=models.SET_NULL)
-    tests = models.CharField(verbose_name='Путь до тестов', max_length=511)
     languages = models.ManyToManyField('Language', verbose_name='Языки', blank=True)
 
     class Meta:
         verbose_name = 'Задача'
         verbose_name_plural = 'Задачи'
 
+    @property
+    def tests_directory(self) -> Path:
+        return Path(settings.TESTS_DIR) / self.slug
+
     def __str__(self):
         return self.slug
 
 
 class Layout(models.Model):
-    path = models.CharField(verbose_name='Путь до папки', max_length=511)
     slug = models.CharField(verbose_name='Слаг', max_length=63, unique=True)
 
     class Meta:
         verbose_name = 'Шаблон'
         verbose_name_plural = 'Шаблоны'
+
+    @property
+    def directory(self) -> Path:
+        return Path(settings.LAYOUTS_DIR) / self.slug
 
     def __str__(self):
         return self.slug
