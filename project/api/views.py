@@ -52,9 +52,9 @@ def create_task(req: HttpRequest):
         os.makedirs(settings.TESTS_DIR / slug, exist_ok=True)
         tests = req_data['tests']
         for i, test in enumerate(tests, start=1):
-            with open(settings.TESTS_DIR / slug / f'{i}.in', 'w') as f:
+            with open(settings.TESTS_DIR / slug / f'input_{i}.txt', 'w') as f:
                 f.write(test['input'])
-            with open(settings.TESTS_DIR / slug / f'{i}.out', 'w') as f:
+            with open(settings.TESTS_DIR / slug / f'output_{i}.txt', 'w') as f:
                 f.write(test['output'])
 
         task = Task.objects.create(
@@ -67,17 +67,8 @@ def create_task(req: HttpRequest):
         task.languages.set(languages)
 
         return HttpResponse(status=201)
-    elif req.method == 'GET':
-        tasks = Task.objects.all()
-        resp_data = []
-        for task in tasks:
-            resp_data.append(
-                {
-                    'id': task.id,
-                }
-            )
-        return JsonResponse(resp_data)
-    return HttpResponseNotAllowed(['GET', 'POST'])
+
+    return HttpResponseNotAllowed(['POST'])
 
 
 class GroupViewSet(ModelViewSet):
