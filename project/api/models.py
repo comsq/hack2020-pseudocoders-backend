@@ -1,12 +1,6 @@
-import os
-
 from pathlib import Path
 from django.conf import settings
 from django.db import models
-
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.template.defaultfilters import slugify
 
 
 # FIXME: на случай доработок после хакатона. По хорошему хэшировать пароли, можно связать с пользователями Django
@@ -56,13 +50,6 @@ class User(models.Model):
         return f'{self.last_name} {self.first_name} {self.middle_name}'
 
 
-@receiver(post_save, sender=User)
-def my_callback(sender, instance, *args, **kwargs):
-    tasks = instance.tasks.all()
-    for task in tasks:
-        os.makedirs(settings.USERS_DIR / instance.login / 'project' / task.slug, exist_ok=True)
-
-
 class Group(models.Model):
     name = models.CharField(verbose_name='Группа', max_length=127)
     slug = models.CharField(verbose_name='Слаг', max_length=63, unique=True)
@@ -76,15 +63,6 @@ class Group(models.Model):
 
     def __str__(self):
         return self.slug
-
-
-@receiver(post_save, sender=Group)
-def post_save_group(sender, instance, *args, **kwargs):
-    users = instance.users.all()
-    tasks = instance.tasks.all()
-    for user in users:
-        for task in tasks:
-            os.makedirs(settings.USERS_DIR / user.login / 'project' / task.slug, exist_ok=True)
 
 
 class Task(models.Model):
@@ -135,7 +113,10 @@ class TaskCheck(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Студент')
     task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name='Задача')
     status = models.CharField(
-        verbose_name='Статус', choices=StatusChoices.choices, max_length=31, default=StatusChoices.RUNNING,
+        verbose_name='Статус',
+        choices=StatusChoices.choices,
+        max_length=31,
+        default=StatusChoices.RUNNING,
     )
     tests_count = models.IntegerField(verbose_name='Количество тестов')
     passed_tests_count = models.IntegerField(verbose_name='Количество пройденных тестов')
