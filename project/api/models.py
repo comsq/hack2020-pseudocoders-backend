@@ -70,7 +70,7 @@ class Task(models.Model):
     name = models.CharField(verbose_name='Название', max_length=127)
     description = models.TextField(verbose_name='Описание')
     slug = models.CharField(verbose_name='Слаг', max_length=63, unique=True)
-    layout = models.ForeignKey('Layout', verbose_name='Шаблон', null=True, on_delete=models.SET_NULL)
+    layout = models.ForeignKey('Layout', verbose_name='Шаблон', null=True, blank=True, on_delete=models.SET_NULL)
     languages = models.ManyToManyField('Language', verbose_name='Языки', blank=True)
 
     class Meta:
