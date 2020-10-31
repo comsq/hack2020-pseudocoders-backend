@@ -31,7 +31,7 @@ class TaskViewSet(ModelViewSet):
     lookup_field = 'slug'
 
     def retrieve(self, request: HttpRequest, slug=None):
-        task = Task.objects.filter(Q(id=slug) | Q(slug=slug)).first()
+        task = Task.objects.filter(slug=slug).first()
         if task is None:
             raise Http404('no task')
         return Response(TaskWithExamplesSerializer(task).data)

@@ -73,28 +73,49 @@ def user_tasks(req: HttpRequest, user_id: int):
     if user is None:
         return HttpResponse(status=404)
 
-    already_added = set()
-    user_tasks = []
-    for task in user.tasks.all():  # type: Task
-        if task.id in already_added:
-            continue
-        already_added.add(task.id)
-        user_tasks.append(serialize_task(task))
-
-    groups = user.groups.all()
-    for group in groups:  # type: Group
-        for task in group.tasks.all():
+    if user.user_type == 'student':
+        already_added = set()
+        student_tasks = []
+        for task in user.tasks.all():  # type: Task
             if task.id in already_added:
                 continue
             already_added.add(task.id)
-            user_tasks.append(serialize_task(task))
+            student_tasks.append(serialize_task(task))
 
-    return JsonResponse(user_tasks, safe=False)
+        groups = user.groups.all()
+        for group in groups:  # type: Group
+            for task in group.tasks.all():
+                if task.id in already_added:
+                    continue
+                already_added.add(task.id)
+                student_tasks.append(serialize_task(task))
+
+        return JsonResponse(student_tasks, safe=False)
+
+    elif user.user_type == 'teacher':
+        teacher_tasks = [serialize_task(task) for task in Task.objects.filter(author=user)]
+        return JsonResponse(teacher_tasks, safe=False)
 
 
 @csrf_exempt
 def user_task_checks(req: HttpRequest, user_id: int):
-    task_checks = [
-        serialize_task_check(task_check) for task_check in TaskCheck.objects.filter(user_id=user_id).order_by('-date')
-    ]
-    return JsonResponse(task_checks, safe=False)
+    user = User.objects.get(pk=user_id)
+    if user is None:
+        return HttpResponse(status=404)
+
+    if user.user_type == 'student':
+        task_checks = [
+            serialize_task_check(task_check)
+            for task_check in TaskCheck.objects.filter(user_id=user_id).order_by('-date')
+        ]
+        return JsonResponse(task_checks, safe=False)
+
+    elif user.user_type == 'teacher':
+        tasks = Task.objects.filter(author=user)
+        return JsonResponse(
+            [
+                serialize_task_check(task_check)
+                for task_check in TaskCheck.objects.filter(task__in=tasks).order_by('-date')
+            ],
+            safe=False,
+        )
