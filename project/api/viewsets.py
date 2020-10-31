@@ -1,8 +1,18 @@
-from django.http import Http404
+from django.db.models import Q
+from django.http import HttpRequest, Http404
+from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
 
 from .models import Group, Language, Task, TaskCheck, User
-from .serialzers import GroupSerializer, LanguageSerializer, TaskSerializer, TaskCheckSerializer, UserSerializer
+from .serialzers import (
+    GroupSerializer,
+    LanguageSerializer,
+    TaskSerializer,
+    TaskCheckSerializer,
+    TaskWithExamplesSerializer,
+    UserSerializer,
+)
 
 
 class GroupViewSet(ModelViewSet):
@@ -19,6 +29,12 @@ class TaskViewSet(ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     lookup_field = 'slug'
+
+    def retrieve(self, request: HttpRequest, slug=None):
+        task = Task.objects.filter(Q(id=slug) | Q(slug=slug)).first()
+        if task is None:
+            raise Http404('no task')
+        return Response(TaskWithExamplesSerializer(task).data)
 
 
 class TaskCheckViewSet(ModelViewSet):
