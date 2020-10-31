@@ -37,14 +37,14 @@ for inputpath in $TESTSDIR/input_*; do
         exit $TIME_LIMIT_ERROR_CODE
     fi
 
-    diff $outputpath $resultpath 2>&1 >/dev/null
+    diff -Bb $outputpath $resultpath 2>&1 >/dev/null
     if (( $? != 0 )); then
         echo "FAIL"
         echo "Head of expected output:"
         head $outputpath
         echo "Head of actual output:"
         head $resultpath
-        exit $(($WRONG_ANSWER_ERROR_CODE + $i))
+        exit $(($WRONG_ANSWER_ERROR_CODE + $i - 1))
     else
         echo "OK"
     fi
