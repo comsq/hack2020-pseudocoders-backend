@@ -1,8 +1,18 @@
 from secrets import choice
 from string import ascii_lowercase
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
-from .models import Task, TaskCheck
+from .models import Task, TaskCheck, User
+
+
+def get_verdict(user: User, task: Task) -> Optional[str]:
+    all_checks = TaskCheck.objects.filter(user=user, task=task).order_by('-date')
+    if len(all_checks) == 0:
+        return None
+    for task_check in all_checks:  # type: TaskCheck
+        if task_check.status == TaskCheck.StatusChoices.OK:
+            return task_check.status
+    return all_checks[0].status
 
 
 def generate_slug(length: int = 30) -> str:
@@ -12,8 +22,8 @@ def generate_slug(length: int = 30) -> str:
     return ''.join(letters)
 
 
-def serialize_task(task: Task) -> Dict[str, Any]:
-    return {
+def serialize_task(task: Task, verdict: Optional[str] = None) -> Dict[str, Any]:
+    serialize_task = {
         "id": task.id,
         "author": {
             "id": task.author.id,
@@ -27,6 +37,11 @@ def serialize_task(task: Task) -> Dict[str, Any]:
         "slug": task.slug,
         "layout": task.layout_id,
     }
+
+    if verdict:
+        serialize_task.update({'verdict': verdict})
+
+    return serialize_task
 
 
 def serialize_task_check(task_check: TaskCheck) -> Dict[str, Any]:
