@@ -11,15 +11,16 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from pathlib import Path
 
 IS_PRODUCTION = bool(os.environ.get('PRODUCTION'))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-USERS_DIR = '/home/students/' if IS_PRODUCTION else '/tmp/students/'
-TESTS_DIR = '/home/tests/' if IS_PRODUCTION else '/tmp/tests/'
-LAYOUTS_DIR = '/home/layouts/' if IS_PRODUCTION else '/tmp/layouts/'
+USERS_DIR = Path('/home/students/') if IS_PRODUCTION else Path('/tmp/students/')
+TESTS_DIR = Path('/home/tests/') if IS_PRODUCTION else Path('/tmp/tests/')
+LAYOUTS_DIR = Path('/home/layouts/') if IS_PRODUCTION else Path('/tmp/layouts/')
 
 for directory in (USERS_DIR, TESTS_DIR, LAYOUTS_DIR):
     try:
