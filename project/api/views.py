@@ -73,11 +73,11 @@ def create_task(req: HttpRequest):
 
 
 @csrf_exempt
-def update_task(req: HttpRequest, slug: str):
+def update_task(req: HttpRequest, task_slug: str):
     if req.method != 'PUT':
         return HttpResponseNotAllowed(['PUT'])
 
-    task = Task.objects.filter(slug=slug).first()
+    task = Task.objects.filter(slug=task_slug).first()
     if task is None:
         return HttpResponse(status=404)
 
@@ -102,14 +102,14 @@ def update_task(req: HttpRequest, slug: str):
         languages = Language.objects.filter(slug__in=req_data['languages'])
 
     if req_data.get('tests'):
-        if os.path.exists(settings.TESTS_DIR / slug):
-            shutil.rmtree(settings.TESTS_DIR / slug)
-        os.makedirs(settings.TESTS_DIR / slug, exist_ok=True)
+        if os.path.exists(settings.TESTS_DIR / task.slug):
+            shutil.rmtree(settings.TESTS_DIR / task.slug)
+        os.makedirs(settings.TESTS_DIR / task.slug, exist_ok=True)
         tests = req_data['tests']
         for i, test in enumerate(tests, start=1):
-            with open(settings.TESTS_DIR / slug / f'input_{i}.txt', 'w') as f:
+            with open(settings.TESTS_DIR / task.slug / f'input_{i}.txt', 'w') as f:
                 f.write(test['input'])
-            with open(settings.TESTS_DIR / slug / f'output_{i}.txt', 'w') as f:
+            with open(settings.TESTS_DIR / task.slug / f'output_{i}.txt', 'w') as f:
                 f.write(test['output'])
 
     task.save()
