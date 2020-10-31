@@ -22,7 +22,6 @@ class User(models.Model):
     birthday = models.DateField(verbose_name='Дата рождения')
     user_type = models.CharField(verbose_name='Роль', choices=TypeChoices.choices, max_length=31)
 
-    groups = models.ManyToManyField('Group', verbose_name='Группы', blank=True)
     tasks = models.ManyToManyField('Task', verbose_name='Задачи', blank=True)
 
     class Meta:
@@ -56,7 +55,8 @@ class Group(models.Model):
     name = models.CharField(verbose_name='Группа', max_length=127)
     slug = models.CharField(verbose_name='Слаг', max_length=63, unique=True)
     tasks = models.ManyToManyField('Task', verbose_name='Задачи', blank=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
+    users = models.ManyToManyField(User, verbose_name='Пользователи', blank=True, related_name='users')
 
     class Meta:
         verbose_name = 'Группа'
