@@ -69,47 +69,59 @@ def create_task(req: HttpRequest):
 
 
 @csrf_exempt
-def update_task(req: HttpRequest, task_id: int):
+def update_task(req: HttpRequest, slug: str):
     if req.method != 'PUT':
         return HttpResponseNotAllowed(['PUT'])
 
-    task = Task.objects.get(pk=task_id)
+    task = Task.objects.filter(slug=slug).first()
+    if task is None:
+        return HttpResponse(status=404)
+
     req_data = json.loads(req.body)
-    slug = req_data.get('slug') or generate_slug(10)
+
+    slug = req_data.get('slug')
+    if slug:
+        task.slug = slug
 
     author_id = req_data.get('author', 1)
-    author = User.objects.get(pk=author_id)
+    author = User.objects.filter(id=author_id).first()
+    if author:
+        task.author = author
 
-    lang_slugs = req_data['languages']
-    languages = Language.objects.filter(slug__in=lang_slugs)
+    if req_data.get('name'):
+        task.name = req_data['name']
+    if req_data.get('description'):
+        task.description = req_data['description']
 
-    if os.path.exists(settings.TESTS_DIR / slug):
-        shutil.rmtree(settings.TESTS_DIR / slug)
-    os.makedirs(settings.TESTS_DIR / slug, exist_ok=True)
-    tests = req_data['tests']
-    for i, test in enumerate(tests, start=1):
-        with open(settings.TESTS_DIR / slug / f'input_{i}.txt', 'w') as f:
-            f.write(test['input'])
-        with open(settings.TESTS_DIR / slug / f'output_{i}.txt', 'w') as f:
-            f.write(test['output'])
+    languages = None
+    if req_data.get('languages'):
+        languages = Language.objects.filter(slug__in=req_data['languages'])
 
-    task.name = req_data['name']
-    task.description = req_data['description']
-    task.slug = slug
-    task.author = author
+    if req_data.get('tests'):
+        if os.path.exists(settings.TESTS_DIR / slug):
+            shutil.rmtree(settings.TESTS_DIR / slug)
+        os.makedirs(settings.TESTS_DIR / slug, exist_ok=True)
+        tests = req_data['tests']
+        for i, test in enumerate(tests, start=1):
+            with open(settings.TESTS_DIR / slug / f'input_{i}.txt', 'w') as f:
+                f.write(test['input'])
+            with open(settings.TESTS_DIR / slug / f'output_{i}.txt', 'w') as f:
+                f.write(test['output'])
+
     task.save()
 
-    task.languages.set(languages)
+    if languages:
+        task.languages.set(languages)
 
     return HttpResponse(status=200)
 
 
 @csrf_exempt
 def user_tasks(req: HttpRequest, user_id: int):
-    '''
+    """
     FIXME: придумай куда вставить нормально создание директорий с заданиями, создавать пачку директорий на каждый GET
     плохо, но для хакатона пойдёт
-    '''
+    """
     user = User.objects.get(pk=user_id)
     if user is None:
         return HttpResponse(status=404)
