@@ -49,7 +49,7 @@ class TaskViewSet(ModelViewSet):
 
 
 class TaskCheckViewSet(ModelViewSet):
-    queryset = TaskCheck.objects.all()
+    queryset = TaskCheck.objects.order_by('-date')
     serializer_class = TaskCheckSerializer
 
 
