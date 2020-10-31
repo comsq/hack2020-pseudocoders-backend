@@ -1,9 +1,9 @@
 #!/bin/bash
 
-COMPILATION_ERROR_CODE=100
-TIME_LIMIT_ERROR_CODE=200
-RUNTIME_ERROR_CODE=300
-WRONG_ANSWER_ERROR_CODE=400
+COMPILATION_ERROR_CODE=11
+TIME_LIMIT_ERROR_CODE=12
+RUNTIME_ERROR_CODE=13
+WRONG_ANSWER_ERROR_CODE=20
 
 WORKDIR=/tmp/workdir
 SOURCEDIR=/source
@@ -27,7 +27,7 @@ cd $WORKDIR
 i=1
 for inputpath in $TESTSDIR/input_*; do
     inputname=$(basename $inputpath)
-    outputpath=$OUTPUTSDIR/output_${inputname#"input_"}
+    outputpath=$TESTSDIR/output_${inputname#"input_"}
     resultpath=$WORKDIR/$inputname
 
     echo -n "Run test case №$i ... "
@@ -44,7 +44,7 @@ for inputpath in $TESTSDIR/input_*; do
         head $outputpath
         echo "Head of actual output:"
         head $resultpath
-        exit $WRONG_ANSWER_ERROR_CODE
+        exit $(($WRONG_ANSWER_ERROR_CODE + $i))
     else
         echo "OK"
     fi

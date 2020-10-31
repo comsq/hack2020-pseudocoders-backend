@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from api import models
-from tasks import code_editor
+from tasks import code_editor, task_check
 from tasks.sample_tasks import create_task
 
 
@@ -75,6 +75,30 @@ def editor_status(request: HttpRequest, user_id: int) -> HttpResponse:
     result = {
         'status': code_editor.status(user_id),
         'port': user.editor_port,
+    }
+
+    return JsonResponse(result, status=202)
+
+
+@csrf_exempt
+def verify_task(request: HttpRequest, user_id: int, task_id: int, language_id: int) -> HttpResponse:
+    try:
+        models.User.objects.get(id=user_id)
+    except models.User.DoesNotExist:
+        return HttpResponseBadRequest()
+
+    try:
+        models.Task.objects.get(id=task_id)
+    except models.Task.DoesNotExist:
+        return HttpResponseBadRequest()
+
+    try:
+        models.Language.objects.get(id=language_id)
+    except models.Language.DoesNotExist:
+        return HttpResponseBadRequest()
+
+    result = {
+        'task_id': task_check.verify.delay(user_id, task_id, language_id).id,
     }
 
     return JsonResponse(result, status=202)
