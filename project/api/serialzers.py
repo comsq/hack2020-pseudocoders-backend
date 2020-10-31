@@ -70,7 +70,7 @@ class TaskWithExamplesSerializer(TaskSerializer):
 
     def get_examples(self, obj: Task):
         tests = []
-        for i in range(1, 3):
+        for i in range(1, 4):
             inp_file = settings.TESTS_DIR / obj.slug / f'input_{i}.txt'
             if not os.path.exists(inp_file):
                 break
