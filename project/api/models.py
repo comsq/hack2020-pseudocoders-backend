@@ -21,8 +21,8 @@ class User(models.Model):
 
     user_directory_path = models.CharField(verbose_name='Папка пользователя', max_length=511)
 
-    groups = models.ManyToManyField('Group', verbose_name='Группы', null=True, blank=True)
-    tasks = models.ManyToManyField('Task', verbose_name='Задачи', null=True, blank=True)
+    groups = models.ManyToManyField('Group', verbose_name='Группы', blank=True)
+    tasks = models.ManyToManyField('Task', verbose_name='Задачи', blank=True)
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -38,7 +38,7 @@ class User(models.Model):
 class Group(models.Model):
     name = models.CharField(verbose_name='Группа', max_length=127)
     slug = models.CharField(verbose_name='Слаг', max_length=63, unique=True)
-    tasks = models.ManyToManyField('Task', verbose_name='Задачи', null=True, blank=True)
+    tasks = models.ManyToManyField('Task', verbose_name='Задачи', blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
@@ -56,7 +56,7 @@ class Task(models.Model):
     slug = models.CharField(verbose_name='Слаг', max_length=63, unique=True)
     layout = models.ForeignKey('Layout', verbose_name='Шаблон', null=True, on_delete=models.SET_NULL)
     tests = models.CharField(verbose_name='Путь до тестов', max_length=511)
-    languages = models.ManyToManyField('Language', verbose_name='Языки', null=True, blank=True)
+    languages = models.ManyToManyField('Language', verbose_name='Языки', blank=True)
 
     class Meta:
         verbose_name = 'Задача'
@@ -88,7 +88,7 @@ class TaskCheck(models.Model):
         WA = 'wa', 'Wrong Answer'
         OK = 'ok', 'OK'
 
-    student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Студент')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Студент')
     task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name='Задача')
     status = models.CharField(
         verbose_name='Статус', choices=StatusChoices.choices, max_length=31, default=StatusChoices.RUNNING,
@@ -103,7 +103,7 @@ class TaskCheck(models.Model):
         verbose_name_plural = 'Результаты проверки'
 
     def __str__(self):
-        return f'{self.student.login} {self.task.slug}'
+        return f'{self.user.login} {self.task.slug}'
 
 
 class Language(models.Model):
