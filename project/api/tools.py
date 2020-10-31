@@ -38,6 +38,12 @@ def serialize_task_check(task_check: TaskCheck) -> Dict[str, Any]:
             "last_name": task_check.user.last_name,
             "first_name": task_check.user.first_name,
         },
+        "task_author": {
+            "id": task_check.task.author.id,
+            "login": task_check.task.author.login,
+            "last_name": task_check.task.author.last_name,
+            "first_name": task_check.task.author.first_name,
+        },
         "task": {
             "id": task_check.task.id,
             "name": task_check.task.name,
